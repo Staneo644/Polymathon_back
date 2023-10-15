@@ -6,18 +6,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.WordModule = void 0;
 const common_1 = require("@nestjs/common");
-const database_module_1 = require("./database/database.module");
-const word_module_1 = require("./word/word.module");
-const user_module_1 = require("./user/user.module");
-const potential_word_module_1 = require("./potential_word/potential_word.module");
-const theme_module_1 = require("./theme/theme.module");
-let AppModule = exports.AppModule = class AppModule {
+const word_controller_1 = require("./word.controller");
+const word_service_1 = require("./word.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const word_1 = require("./word");
+let WordModule = exports.WordModule = class WordModule {
 };
-exports.AppModule = AppModule = __decorate([
+exports.WordModule = WordModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, word_module_1.WordModule, user_module_1.UserModule, potential_word_module_1.PotentialWordModule, theme_module_1.ThemeModule],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([word_1.Word])
+        ],
+        controllers: [word_controller_1.WordController],
+        providers: [word_service_1.WordService]
     })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+], WordModule);
+//# sourceMappingURL=word.module.js.map

@@ -80,7 +80,7 @@ create: build
 # ~~~~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~
 
 database :
-	docker-compose up mongodb
+	docker-compose up db
 
 back: 
 	docker-compose up back

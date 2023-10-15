@@ -1,0 +1,7 @@
+enum Gender {
+    nm = 'nm',
+    nf = 'nf',
+    verbe = 'verbe',
+    adj = 'adj',
+    adv = 'adv',
+}

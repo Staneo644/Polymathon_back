@@ -11,6 +11,9 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const dotenv = require("dotenv");
 dotenv.config();
+console.log(process.env.POSTGRES_HOST);
+console.log(process.env.POSTGRES_PORT);
+console.log(process.env.POSTGRES_USER);
 let DatabaseModule = exports.DatabaseModule = class DatabaseModule {
 };
 exports.DatabaseModule = DatabaseModule = __decorate([
@@ -23,7 +26,7 @@ exports.DatabaseModule = DatabaseModule = __decorate([
                 username: process.env.POSTGRES_USER,
                 password: process.env.POSTGRES_PASSWORD,
                 database: process.env.POSTGRES_DB,
-                entities: ['dist/**/**/*.entity{.ts,.js}'],
+                entities: ['dist/**/**/*{.ts,.js}'],
                 synchronize: true,
             }),
         ],

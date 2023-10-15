@@ -6,18 +6,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.PotentialWordModule = void 0;
 const common_1 = require("@nestjs/common");
-const database_module_1 = require("./database/database.module");
-const word_module_1 = require("./word/word.module");
-const user_module_1 = require("./user/user.module");
-const potential_word_module_1 = require("./potential_word/potential_word.module");
-const theme_module_1 = require("./theme/theme.module");
-let AppModule = exports.AppModule = class AppModule {
+const potential_word_controller_1 = require("./potential_word.controller");
+const potential_word_service_1 = require("./potential_word.service");
+let PotentialWordModule = exports.PotentialWordModule = class PotentialWordModule {
 };
-exports.AppModule = AppModule = __decorate([
+exports.PotentialWordModule = PotentialWordModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, word_module_1.WordModule, user_module_1.UserModule, potential_word_module_1.PotentialWordModule, theme_module_1.ThemeModule],
+        controllers: [potential_word_controller_1.PotentialWordController],
+        providers: [potential_word_service_1.PotentialWordService]
     })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+], PotentialWordModule);
+//# sourceMappingURL=potential_word.module.js.map

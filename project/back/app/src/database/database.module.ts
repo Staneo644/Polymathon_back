@@ -4,6 +4,11 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+console.log(process.env.POSTGRES_HOST);
+console.log(process.env.POSTGRES_PORT);
+console.log(process.env.POSTGRES_USER);
+
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -13,7 +18,7 @@ dotenv.config();
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: ['dist/**/**/*.entity{.ts,.js}'],
+      entities: ['dist/**/**/*{.ts,.js}'],
       synchronize: true,
     }),
   ],

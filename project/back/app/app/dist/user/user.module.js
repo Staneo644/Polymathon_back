@@ -6,18 +6,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
-const database_module_1 = require("./database/database.module");
-const word_module_1 = require("./word/word.module");
-const user_module_1 = require("./user/user.module");
-const potential_word_module_1 = require("./potential_word/potential_word.module");
-const theme_module_1 = require("./theme/theme.module");
-let AppModule = exports.AppModule = class AppModule {
+const user_service_1 = require("./user.service");
+const user_controller_1 = require("./user.controller");
+let UserModule = exports.UserModule = class UserModule {
 };
-exports.AppModule = AppModule = __decorate([
+exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, word_module_1.WordModule, user_module_1.UserModule, potential_word_module_1.PotentialWordModule, theme_module_1.ThemeModule],
+        providers: [user_service_1.UserService],
+        controllers: [user_controller_1.UserController]
     })
-], AppModule);
-//# sourceMappingURL=app.module.js.map
+], UserModule);
+//# sourceMappingURL=user.module.js.map
