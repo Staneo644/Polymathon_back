@@ -1,6 +1,6 @@
 import { Controller, Put } from '@nestjs/common';
 import { WordService } from './word.service';
-import { Word } from './word';
+import { Word } from './word.entity';
 import { Get, Post, Patch, Delete, Param, Body, NotFoundException } from '@nestjs/common';
 
 @Controller('word')
