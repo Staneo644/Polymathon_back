@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+//import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
-
+const { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } = require('typeorm');
 
 
 @Entity()

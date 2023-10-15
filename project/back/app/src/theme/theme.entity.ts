@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
-// import { Word } from 'src/word/word';
+const { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } = require('typeorm');// import { Word } from 'src/word/word';
 
 @Entity()
 export class Theme {

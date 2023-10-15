@@ -2,6 +2,8 @@ import { Controller, Put } from '@nestjs/common';
 import { WordService } from './word.service';
 import { Word } from './word.entity';
 import { Get, Post, Patch, Delete, Param, Body, NotFoundException } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
+
 
 @Controller('word')
 export class WordController {
@@ -16,6 +18,7 @@ export class WordController {
     return word;
   }
 
+  @UseGuards(JwtIsAuthGuard)
   @Put(':id') 
   async note_word(@Body() note:boolean, @Param('id') id: number) {
     const word = await this.wordService.note_word(note, id);
@@ -43,7 +46,7 @@ export class WordController {
     return { message: 'Word deleted successfully' };
   }
 
-  @Get('/word')
+  @Get('word')
   async getWordByName(@Body() name: string) {
     const word = await this.wordService.getWordByName(name);
     if (!word) {

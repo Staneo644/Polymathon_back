@@ -18,10 +18,7 @@ export class WordService {
         const itemCount = await this.wordRepository.count();
         if (itemCount == 0) throw new NotFoundException('No random word found.');
         const randomIndex = Math.floor(Math.random() * itemCount);
-  
-  
         const randomWord = await this.wordRepository.query(`SELECT * FROM items OFFSET ${randomIndex} LIMIT 1`);
-    
         return randomWord;
       }
 
