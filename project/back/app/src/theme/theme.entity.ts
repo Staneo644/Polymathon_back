@@ -1,4 +1,11 @@
-const { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } = require('typeorm');// import { Word } from 'src/word/word';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Word } from 'src/word/word.entity';
 
 @Entity()
 export class Theme {
@@ -8,18 +15,15 @@ export class Theme {
   @Column()
   title: string;
 
-  @Column()
-  number_word: number;
+  @Column({ default: true })
+  can_have_words: boolean;
 
-  @Column({ nullable: true })
-  parent: number;
+  @OneToMany(() => Word, (word) => word.theme)
+  words: Word[];
 
-//   @OneToMany(() => Word, (word) => word.theme)
-//   words: Word[];
-
-  @ManyToOne(() => Theme, (theme) => theme.subthemes)
-  parentTheme: Theme;
+  @ManyToOne(() => Theme, (theme) => theme.childrenThemes)
+  parentTheme: Theme | null;
 
   @OneToMany(() => Theme, (theme) => theme.parentTheme)
-  subthemes: Theme[];
+  childrenThemes: Theme[];
 }

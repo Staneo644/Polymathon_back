@@ -1,7 +1,14 @@
 //import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
-const { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } = require('typeorm');
+import { Theme } from 'src/theme/theme.entity';
 
+const {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+} = require('typeorm');
 
 @Entity()
 export class Word {
@@ -20,8 +27,8 @@ export class Word {
   @Column()
   etymology: string;
 
-  //@ManyToOne(() => Theme, (theme) => theme.words)
-  theme: string[];
+  @ManyToOne(() => Theme, (theme) => theme.words)
+  theme: Theme;
 
   @Column({ default: 0 })
   positive_note: number;

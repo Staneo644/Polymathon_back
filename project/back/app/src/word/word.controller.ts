@@ -1,9 +1,16 @@
 import { Controller, Put } from '@nestjs/common';
 import { WordService } from './word.service';
 import { Word } from './word.entity';
-import { Get, Post, Patch, Delete, Param, Body, NotFoundException } from '@nestjs/common';
+import {
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  NotFoundException,
+} from '@nestjs/common';
 import { UseGuards } from '@nestjs/common';
-
 
 @Controller('word')
 export class WordController {
@@ -18,9 +25,9 @@ export class WordController {
     return word;
   }
 
-  @UseGuards(JwtIsAuthGuard)
-  @Put(':id') 
-  async note_word(@Body() note:boolean, @Param('id') id: number) {
+  //@UseGuards(JwtIsAuthGuard)
+  @Put(':id')
+  async note_word(@Body() note: boolean, @Param('id') id: number) {
     const word = await this.wordService.note_word(note, id);
     if (!word) {
       throw new NotFoundException('No random word found.');

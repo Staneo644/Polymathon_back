@@ -9,15 +9,19 @@ import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 
-
 @Module({
   imports: [
-  
-      JwtModule.register({
-        secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '1d' },
-      }),
-    DatabaseModule, WordModule, UserModule, PotentialWordModule, ThemeModule, AuthModule],
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1d' },
+    }),
+    DatabaseModule,
+    WordModule,
+    UserModule,
+    PotentialWordModule,
+    ThemeModule,
+    AuthModule,
+  ],
   providers: [AuthService, JwtStrategy],
 })
 export class AppModule {}
