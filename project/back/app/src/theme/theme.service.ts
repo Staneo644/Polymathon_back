@@ -20,6 +20,10 @@ export class ThemeService {
     return themes;
   }
 
+  async getThemeByName(title: string): Promise<Theme> {
+    return this.themeRepository.findOne({ where: { title } });
+  }
+
   async addTheme(themeData: Partial<Theme>): Promise<Theme> {
     const newTheme = this.themeRepository.create(themeData);
     return this.themeRepository.save(newTheme);

@@ -40,8 +40,8 @@ export class WordService {
   }
 
   async createWord(wordData: PotentialWord): Promise<Word> {
-    const theme = await this.themeService.getThemeById(wordData.themeId);
-    let value = new Word();
+    const theme = await this.themeService.getThemeByName(wordData.theme);
+    const value = new Word();
     value.name = wordData.name;
     value.theme = theme;
     value.positive_note = 0;

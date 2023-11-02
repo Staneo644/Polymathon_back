@@ -46,7 +46,7 @@ export class PotentialWordService {
     const extractedDefinitions: definition_wik[] = [];
     for (let index = 0; index < natureDef.length; index++) {
       natureDef[index].forEach((definitionObj: { [key: string]: string }) => {
-        let result: definition_wik = { definition: [], nature: '' };
+        const result: definition_wik = { definition: [], nature: '' };
         result.nature = nature[index];
         console.log('objet def', definitionObj);
         const definition: string[] = [];
@@ -66,7 +66,7 @@ export class PotentialWordService {
 
   async getPotentialWords(): Promise<potential_word_id[]> {
     const res = await this.potentialWordRepository.find();
-    let potentialWords: potential_word_id[] = [];
+    const potentialWords: potential_word_id[] = [];
     for (const potentialWord of res) {
       potentialWords.push({
         id: potentialWord.id,

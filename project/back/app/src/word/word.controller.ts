@@ -3,14 +3,14 @@ import { WordService } from './word.service';
 import { Word } from './word.entity';
 import {
   Get,
-  Post,
   Patch,
   Delete,
   Param,
   Body,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
-import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('word')
 export class WordController {
@@ -25,7 +25,7 @@ export class WordController {
     return word;
   }
 
-  //@UseGuards(JwtIsAuthGuard)
+  @UseGuards(AuthGuard)
   @Put(':id')
   async note_word(@Body() note: boolean, @Param('id') id: number) {
     const word = await this.wordService.note_word(note, id);
@@ -35,6 +35,8 @@ export class WordController {
     return word;
   }
 
+
+  @UseGuards(AuthGuard)
   @Patch(':id')
   async updateWord(@Param('id') id: number, @Body() wordData: Word) {
     const updatedWord = await this.wordService.updateWord(id, wordData);
@@ -44,6 +46,7 @@ export class WordController {
     return updatedWord;
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async deleteWord(@Param('id') id: number) {
     const result = await this.wordService.deleteWord(id);
@@ -60,11 +63,5 @@ export class WordController {
       throw new NotFoundException('Word not found.');
     }
     return word;
-  }
-
-  @Get()
-  async getAllWords() {
-    const words = await this.wordService.getAllWords();
-    return words;
   }
 }

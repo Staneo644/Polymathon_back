@@ -85,6 +85,9 @@ database :
 back: 
 	docker-compose up back
 
+adminer :
+	docker-compose up adminer
+
 start: build
 	# printf "%-62b%b" "$(BOLD)$(GREEN)Starting$(END) containers"
 	docker-compose -f docker-compose.yml up

@@ -1,48 +1,52 @@
 import { Controller } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
-import {
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  NotFoundException,
-} from '@nestjs/common';
+import { Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { jwtConstants } from 'src/auth/jwt.constant';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post()
-  createUser(@Body() user: User): Promise<User> {
-    return this.userService.createUser(user);
+  async createUser(@Body() user: User) {
+    console.log(user);
+    console.log(jwtConstants)
+    return await this.userService.createUser(user);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: number): Promise<void> {
-    return this.userService.deleteUser(id);
+  async deleteUser(@Param('id') id: number): Promise<void> {
+    return await this.userService.deleteUser(id);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id/password')
-  changePassword(
+  async changePassword(
     @Param('id') id: number,
     @Body('newPassword') newPassword: string,
   ): Promise<void> {
-    return this.userService.changePassword(id, newPassword);
+    return await this.userService.changePassword(id, newPassword);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id/email')
-  changeEmail(
+  async changeEmail(
     @Param('id') id: number,
     @Body('newEmail') newEmail: string,
   ): Promise<void> {
-    return this.userService.changeEmail(id, newEmail);
+    return await this.userService.changeEmail(id, newEmail);
   }
 
   @Get(':id')
-  isUser(@Param('id') id: number): Promise<boolean> {
-    return this.userService.isUser(id);
+  async isUser(@Param('id') id: number): Promise<boolean> {
+    return await this.userService.isUser(id);
+  }
+
+  @Post('login')
+  async login(@Body() user: User) {
+    console.log(await this.userService.login(user));
+    return await this.userService.login(user);
   }
 }
