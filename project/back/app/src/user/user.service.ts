@@ -54,11 +54,15 @@ export class UserService {
   }
 
   async login(user: User) {
+    console.log(user)
     const RealUser = await this.getUserByEmail(user.email);
+    console.log(RealUser);
     if (!RealUser) return null;
     if (bcrypt.compare(user.password, RealUser.password)) {
-
-      const payload = { sub: RealUser.id, username: RealUser.email };
+      let role = 'user';
+      if (user.email === 'polymathon@proton.me' || user.email === 'aurele.josserand@gmail.com')
+        role = 'admin';
+      const payload = { sub: RealUser.id, username: RealUser.email, role: role };
       return {
         access_token: this.jwtService.sign(payload, { secret: jwtConstants.secret }),
       };

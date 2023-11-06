@@ -46,6 +46,15 @@ export class WordController {
     return updatedWord;
   }
 
+  @Get('day')
+  async getDayWords(): Promise<Word[]> {
+    try{return await this.wordService.getDayWords()}
+    catch (e) {
+      console.log(e);
+    }
+     
+  }
+
   @UseGuards(AuthGuard)
   @Delete(':id')
   async deleteWord(@Param('id') id: number) {

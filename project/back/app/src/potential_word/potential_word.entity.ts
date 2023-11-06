@@ -26,7 +26,7 @@ export class PotentialWord {
   gender: string;
 
   @Column()
-  etymology: string;
+  etymologie: string;
 
   @ManyToOne(() => User, (user) => user.email)
   @JoinColumn({ name: 'userEmail' })

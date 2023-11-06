@@ -28,13 +28,16 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.0",
     "bcrypt": "^5.1.1",
+    "csv-parser": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.2",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -44,8 +47,10 @@
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
     "@types/supertest": "^2.0.12",
+    "@types/xmldom": "^0.1.33",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "cheerio": "^1.0.0-rc.12",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.1",

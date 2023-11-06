@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PotentialWord } from './potential_word.entity';
 import { WordService } from '../word/word.service';
-import { definition_wik, potential_word_id } from 'src/entity';
+import { definition_wik, potential_word_id, word } from 'src/entity';
+import { UserService } from 'src/user/user.service';
+import * as cheerio from 'cheerio';
 
 @Injectable()
 export class PotentialWordService {
@@ -11,6 +13,7 @@ export class PotentialWordService {
     @InjectRepository(PotentialWord)
     private readonly potentialWordRepository: Repository<PotentialWord>,
     private readonly wordService: WordService,
+    private readonly userService: UserService
   ) {}
 
   removeHtmlTags(input: string): string {
@@ -19,30 +22,33 @@ export class PotentialWordService {
   }
 
   decodeHTMLEntities(input: string): string | null {
-    const doc = new DOMParser().parseFromString(input, 'text/html');
-    return doc.documentElement.textContent;
+    const $ = cheerio.load(input);
+  return $.html();
+    //return doc.documentElement.textContent;
   }
 
   async getDefinition(word: string): Promise<definition_wik[]> {
-    const response = await fetch('http://localhost:8081/app/api_wiki.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      },
-      body: 'motWiki=' + word,
-    });
+    try {
 
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+      const response = await fetch('http://localhost:8081/app/api_wiki.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        },
+        body: 'motWiki=' + word,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
     }
     const jsonData = await response.json();
     console.log(jsonData);
-    if (jsonData.error !== '') {
-      throw new Error(jsonData.error);
+    if ( jsonData.error !== '' || response.status !== 200 || jsonData.natureDef === undefined) {
+      return ([])
     }
     const natureDef = jsonData.natureDef;
     const nature = jsonData.nature;
-
+    
     const extractedDefinitions: definition_wik[] = [];
     for (let index = 0; index < natureDef.length; index++) {
       natureDef[index].forEach((definitionObj: { [key: string]: string }) => {
@@ -53,15 +59,19 @@ export class PotentialWordService {
         for (const key in definitionObj) {
           const temp = this.decodeHTMLEntities(
             this.removeHtmlTags(definitionObj[key]),
-          );
-          if (temp) definition.push(temp);
-        }
-        result.definition = definition;
-        extractedDefinitions.push(result);
-        console.log(result);
-      });
+            );
+            if (temp) definition.push(temp);
+          }
+          result.definition = definition;
+          extractedDefinitions.push(result);
+          console.log(result);
+        });
+      }
+      return extractedDefinitions;
     }
-    return extractedDefinitions;
+      catch (e) {
+        console.log(e);
+      }
   }
 
   async getPotentialWords(): Promise<potential_word_id[]> {
@@ -74,21 +84,23 @@ export class PotentialWordService {
         definition: potentialWord.definition,
         gender: potentialWord.gender,
         theme: potentialWord.theme,
-        etymology: potentialWord.etymology,
-        user: potentialWord.user.email,
+        etymology: potentialWord.etymologie,
+        user: potentialWord.user?.email,
         wiki_def: await this.getDefinition(potentialWord.name),
       });
     }
     return potentialWords;
   }
 
-  async createPotentialWord(potentialWordData) {
+  async createPotentialWord(potentialWordData: word, user:string) {
     const potentialWord =
       this.potentialWordRepository.create(potentialWordData);
+      potentialWord.user = await this.userService.getUserByEmail(user);
+      console.log(potentialWord);
     return this.potentialWordRepository.save(potentialWord);
   }
 
-  async validatePotentialWord(id) {
+  async validatePotentialWord(id:number) {
     const potentialWord = await this.potentialWordRepository.findOne({
       where: { id },
     });

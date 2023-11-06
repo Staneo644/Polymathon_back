@@ -3,6 +3,8 @@
 import { Theme } from 'src/theme/theme.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
+export const filePath = './words.csv';
+
 @Entity()
 export class Word {
   @PrimaryGeneratedColumn()
