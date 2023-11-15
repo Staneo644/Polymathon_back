@@ -3,7 +3,7 @@ import { ThemeService } from './theme.service';
 import { Theme } from './theme.entity';
 import { Get, Post, Delete, Param, Body } from '@nestjs/common';
 import { Word } from 'src/word/word.entity';
-import { theme_id } from 'src/entity';
+import { theme, theme_id } from 'src/entity';
 
 @Controller('theme')
 export class ThemeController {
@@ -15,7 +15,8 @@ export class ThemeController {
   }
 
   @Post()
-  async addTheme(@Body() themeData: Partial<Theme>): Promise<Theme> {
+  public async addTheme(@Body() themeData: theme): Promise<Theme> {
+    themeData.name = themeData.name.toLowerCase();
     return this.themeService.addTheme(themeData);
   }
 
@@ -28,4 +29,11 @@ export class ThemeController {
   async getRandomWordByTheme(@Param('id') themeId: number): Promise<Word[]> {
     return this.themeService.getRandomWordsByTheme(themeId);
   }
+
+
+  // @Post('admin')
+  // @UseGuards(AuthGuard)
+  // async refreshThemeAdmin(): Promise<Theme> {
+
+  // }
 }

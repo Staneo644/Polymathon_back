@@ -65,8 +65,8 @@ export class WordController {
     return { message: 'Word deleted successfully' };
   }
 
-  @Get('word')
-  async getWordByName(@Body() name: string) {
+  @Get(':name')
+  async getWordByName(@Param('name') name: string) {
     const word = await this.wordService.getWordByName(name);
     if (!word) {
       throw new NotFoundException('Word not found.');

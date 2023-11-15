@@ -83,8 +83,9 @@ export class PotentialWordService {
         name: potentialWord.name,
         definition: potentialWord.definition,
         gender: potentialWord.gender,
+        example: potentialWord.example,
         theme: potentialWord.theme,
-        etymology: potentialWord.etymologie,
+        etymology: potentialWord.etymology,
         user: potentialWord.user?.email,
         wiki_def: await this.getDefinition(potentialWord.name),
       });
@@ -92,7 +93,10 @@ export class PotentialWordService {
     return potentialWords;
   }
 
-  async createPotentialWord(potentialWordData: word, user:string) {
+  async createPotentialWord(potentialWordData: word, user:string, word:string) {
+    if (await this.wordService.getWordByName(word) || await this.wordService.getWordByName(potentialWordData.name)) {
+      throw new Error('Word already exists');
+    }
     const potentialWord =
       this.potentialWordRepository.create(potentialWordData);
       potentialWord.user = await this.userService.getUserByEmail(user);

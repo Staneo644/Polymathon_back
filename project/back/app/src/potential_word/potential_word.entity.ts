@@ -23,10 +23,13 @@ export class PotentialWord {
   definition: string;
 
   @Column()
-  gender: string;
+  etymology: string;
+  
+  @Column()
+  example: string;
 
   @Column()
-  etymologie: string;
+  gender: string;
 
   @ManyToOne(() => User, (user) => user.email)
   @JoinColumn({ name: 'userEmail' })

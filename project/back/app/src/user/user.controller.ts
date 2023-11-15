@@ -13,6 +13,7 @@ export class UserController {
   async createUser(@Body() user: User) {
     console.log(user);
     console.log(jwtConstants)
+    user.email = user.email.toLowerCase();
     return await this.userService.createUser(user);
   }
 
@@ -36,6 +37,7 @@ export class UserController {
     @Param('id') id: number,
     @Body('newEmail') newEmail: string,
   ): Promise<void> {
+    newEmail = newEmail.toLowerCase();
     return await this.userService.changeEmail(id, newEmail);
   }
 
@@ -46,6 +48,7 @@ export class UserController {
 
   @Post('login')
   async login(@Body() user: User) {
+    user.email = user.email.toLowerCase();
     console.log(await this.userService.login(user));
     return await this.userService.login(user);
   }

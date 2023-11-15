@@ -90,7 +90,7 @@ export class WordService {
     value.positive_note = 0;
     value.negative_note = 0;
     value.definition = wordData.definition;
-    value.etymology = wordData.etymologie;
+    value.etymology = wordData.etymology;
     value.gender = wordData.gender;
     const word = await this.getWordByName(wordData.name);
     if (word) {
@@ -124,10 +124,11 @@ export class WordService {
   .on('data', (row) => {
     words.push({
       name: row[0],
-      gender: row[1],
-      definition: row[2],
-      etymologie: row[3],
-      theme: row[4],
+      definition: row[1],
+      etymology: row[2],
+      example: row[3],
+      gender: row[4],
+      theme: row[5],
       user: null,
       id: 0,
     });

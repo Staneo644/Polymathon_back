@@ -2,6 +2,7 @@ export interface word {
   name: string;
   definition: string;
   etymology: string;
+  example: string;
   gender: string;
   theme: string;
 }

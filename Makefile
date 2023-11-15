@@ -86,7 +86,7 @@ back:
 	docker-compose up back
 
 adminer :
-	docker-compose up php
+	docker-compose up -d php
 	docker-compose up adminer
 
 start: build
