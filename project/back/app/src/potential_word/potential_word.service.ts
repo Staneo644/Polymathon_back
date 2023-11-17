@@ -34,7 +34,7 @@ export class PotentialWordService {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         },
-        body: 'motWiki=' + word,
+        body: 'motWiki=' + word.replace(/\s/g, '_'),
       });
 
       if (!response.ok) {
