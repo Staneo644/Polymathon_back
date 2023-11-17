@@ -1,7 +1,15 @@
 import { Controller } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
-import { Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { jwtConstants } from 'src/auth/jwt.constant';
 
@@ -12,7 +20,7 @@ export class UserController {
   @Post()
   async createUser(@Body() user: User) {
     console.log(user);
-    console.log(jwtConstants)
+    console.log(jwtConstants);
     user.email = user.email.toLowerCase();
     return await this.userService.createUser(user);
   }

@@ -13,11 +13,20 @@ import { UserService } from 'src/user/user.service';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PotentialWord]), 
+  imports: [
+    TypeOrmModule.forFeature([PotentialWord]),
     TypeOrmModule.forFeature([Word]),
     TypeOrmModule.forFeature([Theme]),
-    TypeOrmModule.forFeature([User])],
+    TypeOrmModule.forFeature([User]),
+  ],
   controllers: [PotentialWordController],
-  providers: [PotentialWordService, WordService, ThemeService, JwtService, UserService, ConfigService],
+  providers: [
+    PotentialWordService,
+    WordService,
+    ThemeService,
+    JwtService,
+    UserService,
+    ConfigService,
+  ],
 })
 export class PotentialWordModule {}

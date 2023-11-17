@@ -17,6 +17,7 @@ export interface potential_word_id extends word {
   id: number;
   wiki_def: definition_wik[];
   user: string;
+  true_word: number;
 }
 
 export interface user {

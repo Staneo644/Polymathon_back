@@ -16,18 +16,21 @@ export class ThemeService {
 
   async getThemes(): Promise<theme_id[]> {
     // let themes: Theme[] = [];
-    const themes = await this.themeRepository.find({relations: ['parentTheme']});
-    if (themes.length === 0)
-    await this.createDefaultTheme();
-    const ret = themes.map(theme => ({
-       name: theme.title,
-       parent: theme.parentTheme?.title,
-       words_number: theme.words?.length??0, 
-    }))
+    const themes = await this.themeRepository.find({
+      relations: ['parentTheme'],
+    });
+    const ret = themes.map((theme) => ({
+      name: theme.title,
+      parent: theme.parentTheme?.title,
+      words_number: theme.words?.length ?? 0,
+    }));
     return ret;
   }
 
   async createDefaultTheme() {
+    if ((await this.getThemeByName('Sans thème')) != null) return;
+
+    await this.addTheme({ name: 'Sans thème', parent: '' });
     await this.addTheme({ name: 'Art', parent: '' });
     await this.addTheme({ name: 'Science', parent: '' });
     await this.addTheme({ name: 'Profession', parent: '' });
@@ -35,36 +38,98 @@ export class ThemeService {
     await this.addTheme({ name: 'Territoire', parent: '' });
     await this.addTheme({ name: 'Expression', parent: '' });
 
-    this.addTheme({ name: 'Musique', parent: (await this.getThemeByName('Art')).title });
-    this.addTheme({ name: 'Peinture', parent: (await this.getThemeByName('Art')).title });
-    this.addTheme({ name: 'Architecture', parent: (await this.getThemeByName('Art')).title });
-    this.addTheme({ name: 'Littérature', parent: (await this.getThemeByName('Art')).title });
-    this.addTheme({ name: 'Gastronomie', parent: (await this.getThemeByName('Art')).title });
-    this.addTheme({ name: 'Œnologie', parent: (await this.getThemeByName('Art')).title });
+    this.addTheme({
+      name: 'Musique',
+      parent: (await this.getThemeByName('Art')).title,
+    });
+    this.addTheme({
+      name: 'Peinture',
+      parent: (await this.getThemeByName('Art')).title,
+    });
+    this.addTheme({
+      name: 'Architecture',
+      parent: (await this.getThemeByName('Art')).title,
+    });
+    this.addTheme({
+      name: 'Littérature',
+      parent: (await this.getThemeByName('Art')).title,
+    });
+    this.addTheme({
+      name: 'Gastronomie',
+      parent: (await this.getThemeByName('Art')).title,
+    });
+    this.addTheme({
+      name: 'Œnologie',
+      parent: (await this.getThemeByName('Art')).title,
+    });
 
+    this.addTheme({
+      name: 'Médecine',
+      parent: (await this.getThemeByName('Science')).title,
+    });
+    this.addTheme({
+      name: 'Astronomie',
+      parent: (await this.getThemeByName('Science')).title,
+    });
+    this.addTheme({
+      name: 'Géologie',
+      parent: (await this.getThemeByName('Science')).title,
+    });
+    this.addTheme({
+      name: 'Botanique',
+      parent: (await this.getThemeByName('Science')).title,
+    });
+    this.addTheme({
+      name: 'Zoologie',
+      parent: (await this.getThemeByName('Science')).title,
+    });
 
-    this.addTheme({ name: 'Médecine', parent: (await this.getThemeByName('Science')).title });
-    this.addTheme({ name: 'Astronomie', parent: (await this.getThemeByName('Science')).title });
-    this.addTheme({ name: 'Géologie', parent: (await this.getThemeByName('Science')).title });
-    this.addTheme({ name: 'Botanique', parent: (await this.getThemeByName('Science')).title });
-    this.addTheme({ name: 'Zoologie', parent: (await this.getThemeByName('Science')).title });
+    this.addTheme({
+      name: 'Agriculture',
+      parent: (await this.getThemeByName('Profession')).title,
+    });
+    this.addTheme({
+      name: 'Marine',
+      parent: (await this.getThemeByName('Profession')).title,
+    });
+    this.addTheme({
+      name: 'Armée',
+      parent: (await this.getThemeByName('Profession')).title,
+    });
+    this.addTheme({
+      name: 'Administration',
+      parent: (await this.getThemeByName('Profession')).title,
+    });
+    this.addTheme({
+      name: 'Équitation',
+      parent: (await this.getThemeByName('Profession')).title,
+    });
 
+    this.addTheme({
+      name: 'Christianisme',
+      parent: (await this.getThemeByName('Religion')).title,
+    });
+    this.addTheme({
+      name: 'Islam',
+      parent: (await this.getThemeByName('Religion')).title,
+    });
+    this.addTheme({
+      name: 'Judaïsme',
+      parent: (await this.getThemeByName('Religion')).title,
+    });
 
-    this.addTheme({ name: 'Agriculture', parent: (await this.getThemeByName('Profession')).title });
-    this.addTheme({ name: 'Marine', parent: (await this.getThemeByName('Profession')).title });
-    this.addTheme({ name: 'Armée', parent: (await this.getThemeByName('Profession')).title });
-    this.addTheme({ name: 'Administration', parent: (await this.getThemeByName('Profession')).title });
-    this.addTheme({ name: 'Équitation', parent: (await this.getThemeByName('Profession')).title });
-
-
-    this.addTheme({ name: 'Christianisme', parent: (await this.getThemeByName('Religion')).title });
-    this.addTheme({ name: 'Islam', parent: (await this.getThemeByName('Religion')).title });
-    this.addTheme({ name: 'Judaïsme', parent: (await this.getThemeByName('Religion')).title });
-
-
-    this.addTheme({ name: 'Orient', parent: (await this.getThemeByName('Territoire')).title });
-    this.addTheme({ name: 'Grèce', parent: (await this.getThemeByName('Territoire')).title });
-    this.addTheme({ name: 'Rome', parent: (await this.getThemeByName('Territoire')).title });
+    this.addTheme({
+      name: 'Orient',
+      parent: (await this.getThemeByName('Territoire')).title,
+    });
+    this.addTheme({
+      name: 'Grèce',
+      parent: (await this.getThemeByName('Territoire')).title,
+    });
+    this.addTheme({
+      name: 'Rome',
+      parent: (await this.getThemeByName('Territoire')).title,
+    });
   }
 
   async getThemeByName(title: string): Promise<Theme> {
@@ -77,10 +142,15 @@ export class ThemeService {
       console.log('Theme already exists');
       return;
     }
-    let parentTheme = null
+    let parentTheme = null;
     if (themeData.parent != '')
-      parentTheme = await this.getThemeByName(themeData.parent??'');
-    const newTheme = this.themeRepository.create({title: themeData.name, parentTheme: parentTheme, childrenThemes: [], words: []});
+      parentTheme = await this.getThemeByName(themeData.parent ?? '');
+    const newTheme = this.themeRepository.create({
+      title: themeData.name,
+      parentTheme: parentTheme,
+      childrenThemes: [],
+      words: [],
+    });
     return this.themeRepository.save(newTheme);
   }
 
@@ -127,6 +197,9 @@ export class ThemeService {
   }
 
   async getThemeById(id: number): Promise<Theme> {
-    return this.themeRepository.findOne( {relations: ['parentTheme'],  where: { id } });
+    return this.themeRepository.findOne({
+      relations: ['parentTheme'],
+      where: { id },
+    });
   }
 }

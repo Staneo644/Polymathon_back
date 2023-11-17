@@ -1,4 +1,4 @@
-import { Controller, Put } from '@nestjs/common';
+import { Controller, Post, Put } from '@nestjs/common';
 import { WordService } from './word.service';
 import { Word } from './word.entity';
 import {
@@ -9,8 +9,10 @@ import {
   Body,
   NotFoundException,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { word_id } from 'src/entity';
 
 @Controller('word')
 export class WordController {
@@ -27,14 +29,13 @@ export class WordController {
 
   @UseGuards(AuthGuard)
   @Put(':id')
-  async note_word(@Body() note: boolean, @Param('id') id: number) {
-    const word = await this.wordService.note_word(note, id);
+  async note_word(@Request() id: any, @Body() note: boolean, @Param('id') wordId: number) {
+    const word = await this.wordService.note_word(note,wordId, id.user.username);
     if (!word) {
       throw new NotFoundException('No random word found.');
     }
     return word;
   }
-
 
   @UseGuards(AuthGuard)
   @Patch(':id')
@@ -48,11 +49,11 @@ export class WordController {
 
   @Get('day')
   async getDayWords(): Promise<Word[]> {
-    try{return await this.wordService.getDayWords()}
-    catch (e) {
+    try {
+      return await this.wordService.getDayWords();
+    } catch (e) {
       console.log(e);
     }
-     
   }
 
   @UseGuards(AuthGuard)
@@ -66,11 +67,27 @@ export class WordController {
   }
 
   @Get(':name')
-  async getWordByName(@Param('name') name: string) {
+  async getWordByName(@Param('name') name: string): Promise<word_id> {
     const word = await this.wordService.getWordByName(name);
     if (!word) {
       throw new NotFoundException('Word not found.');
     }
-    return word;
+    return this.wordService.convertWord(word);
+  }
+
+  @Get('id/:id')
+  async getWordById(@Param('id') id: number): Promise<word_id> {
+    const word = await this.wordService.getWordById(id);
+    if (!word) {
+      throw new NotFoundException('Word not found.');
+    }
+    return this.wordService.convertWord(word);
+  }
+
+  @Post(':id')
+  @UseGuards(AuthGuard)
+  async seeWord(@Request() id: any, @Param('id') id_word: number) {
+    const newWord = await this.wordService.seeWord(id_word, id.user.username);
+    return newWord;
   }
 }

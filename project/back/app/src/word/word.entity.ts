@@ -1,7 +1,8 @@
 //import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
 import { Theme } from 'src/theme/theme.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { User } from 'src/user/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinColumn, JoinTable } from 'typeorm';
 
 export const filePath = './words.csv';
 
@@ -22,12 +23,18 @@ export class Word {
   @Column()
   etymology: string;
 
+  @Column()
+  example: string;
+
   @ManyToOne(() => Theme, (theme) => theme.words)
+  @JoinColumn({ name: 'theme' })
   theme: Theme;
 
-  @Column({ default: 0 })
-  positive_note: number;
+  @ManyToMany(() => User, (User) => User.positive_note)
+  @JoinTable()
+  positive_note: User[];
 
-  @Column({ default: 0 })
-  negative_note: number;
+  @ManyToMany(() => User, (User) => User.negative_note)
+  @JoinTable()
+  negative_note: User[];
 }
