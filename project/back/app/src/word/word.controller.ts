@@ -19,8 +19,8 @@ export class WordController {
   constructor(private readonly wordService: WordService) {}
 
   @Get('random')
-  async getRandomWord() {
-    const word = await this.wordService.getRandomWord();
+  async getRandomWord(): Promise<word_id[]> {
+    const word = await this.wordService.getRandomWordList();
     if (!word) {
       throw new NotFoundException('No random word found.');
     }
@@ -48,8 +48,9 @@ export class WordController {
   }
 
   @Get('day')
-  async getDayWords(): Promise<Word[]> {
+  async getDayWords(): Promise<word_id[]> {
     try {
+      console.log('///////////////////////');
       return await this.wordService.getDayWords();
     } catch (e) {
       console.log(e);
@@ -68,6 +69,7 @@ export class WordController {
 
   @Get(':name')
   async getWordByName(@Param('name') name: string): Promise<word_id> {
+    name = name.toLocaleLowerCase();
     const word = await this.wordService.getWordByName(name);
     if (!word) {
       throw new NotFoundException('Word not found.');

@@ -6,6 +6,10 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinColu
 
 export const filePath = './words.csv';
 
+export const usedDayWordLength = 20;
+export const numberOfDayWord = 3;
+export const numberOfWordTake = 10;
+
 @Entity()
 export class Word {
   @PrimaryGeneratedColumn()

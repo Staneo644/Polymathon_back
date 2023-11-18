@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Word, filePath } from './word.entity';
+import { Word, filePath, numberOfDayWord, numberOfWordTake } from './word.entity';
 import { NotFoundException } from '@nestjs/common';
 import { PotentialWord } from 'src/potential_word/potential_word.entity';
 import { ThemeService } from 'src/theme/theme.service';
@@ -11,7 +11,7 @@ import * as csv from 'csv-parser';
 import { word, word_id } from 'src/entity';
 import { UserService } from 'src/user/user.service';
 import * as readline from 'readline';
-import { get } from 'http';
+import { usedDayWordLength } from './word.entity';
 
 @Injectable()
 export class WordService {
@@ -32,14 +32,16 @@ export class WordService {
   async changeDayWords() {
     try {
       this.usedDayWords = this.usedDayWords.concat(this.dayWords);
-      if (this.usedDayWords.length > 99)
+      if (this.usedDayWords.length > usedDayWordLength)
         this.usedDayWords.slice(this.dayWords.length);
       this.dayWords = [];
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < numberOfDayWord; i++) {
+        
         let word: Word;
         do {
           word = await this.getRandomWord();
-        } while (!this.usedDayWords.includes(word));
+          console.log(word);
+        } while (this.usedDayWords.includes(word));
         this.dayWords.push(word);
       }
     } catch (e) {
@@ -47,21 +49,35 @@ export class WordService {
     }
   }
 
-  async getDayWords(): Promise<Word[]> {
+  async getDayWords(): Promise<word_id[]> {
     await this.getWords()
     if (this.dayWords.length === 0) {
       await this.changeDayWords();
     }
-    return this.dayWords;
+    console.log(this.dayWords + 'A')
+    return this.dayWords.map((word) => this.convertWord(word));
+  }
+
+  async getRandomWordList(): Promise<word_id[]> {
+    await this.getWords()
+    const words = await this.wordRepository.find({ relations: ['theme', 'positive_note', 'negative_note'] });
+    const randomWords = [];
+    for (let i = 0; i < numberOfWordTake; i++) {
+      let word: Word;
+      do {
+        word = words[Math.floor(Math.random() * words.length)];
+      } while (randomWords.includes(word));
+      randomWords.push(word);
+    }
+    return randomWords.map((word) => this.convertWord(word));
+
   }
 
   async getRandomWord(): Promise<Word> {
     const itemCount = await this.wordRepository.count();
     if (itemCount == 0) throw new NotFoundException('No random word found.');
-    const randomIndex = Math.floor(Math.random() * itemCount);
-    const randomWord = await this.wordRepository.query(
-      `SELECT * FROM items OFFSET ${randomIndex} LIMIT 1`,
-    );
+    const id = Math.floor(Math.random() * itemCount) + 1;
+    const randomWord = await this.wordRepository.findOne({where: { id }, relations: ['theme', 'positive_note', 'negative_note']});
     return randomWord;
   }
 
