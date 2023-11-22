@@ -9,9 +9,11 @@ import {
   Param,
   Body,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { jwtConstants } from 'src/auth/jwt.constant';
+import { user_id } from 'src/entity';
 
 @Controller('user')
 export class UserController {
@@ -28,6 +30,12 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: number): Promise<void> {
     return await this.userService.deleteUser(id);
+  }
+
+  @Get('email')
+  @UseGuards(AuthGuard)
+  async getUserEmail(@Request() id: any): Promise<user_id> {
+    return await this.userService.getUserByEmail(id.user.username);
   }
 
   @UseGuards(AuthGuard)
@@ -49,7 +57,7 @@ export class UserController {
     return await this.userService.changeEmail(id, newEmail);
   }
 
-  @Get(':id')
+  @Get('isUser/:id')
   async isUser(@Param('id') id: number): Promise<boolean> {
     return await this.userService.isUser(id);
   }
@@ -57,7 +65,6 @@ export class UserController {
   @Post('login')
   async login(@Body() user: User) {
     user.email = user.email.toLowerCase();
-    console.log(await this.userService.login(user));
     return await this.userService.login(user);
   }
 }

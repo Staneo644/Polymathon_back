@@ -21,4 +21,12 @@ export class User {
 
   @ManyToMany(() => Word, (word) => word.negative_note)
   negative_note: Word[];
+
+  hasPositiveWord (word:string):boolean {
+    return this.positive_note.some((wordEntity) => wordEntity.name === word);
+  }
+
+  hasNegativeWord (word:string):boolean {
+    return this.negative_note.some((wordEntity) => wordEntity.name === word);
+  }
 }

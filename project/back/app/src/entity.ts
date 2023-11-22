@@ -11,6 +11,7 @@ export interface word_id extends word {
   id: number;
   positive_note: number;
   negative_note: number;
+  personnal_note: note;
 }
 
 export interface potential_word_id extends word {
@@ -42,4 +43,10 @@ export interface theme_id extends theme {
 export interface definition_wik {
   definition: string[];
   nature: string;
+}
+
+export enum note {
+  neutre = 0,
+  positif = 1,
+  negatif = 2,
 }

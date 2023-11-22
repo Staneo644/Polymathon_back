@@ -1,4 +1,4 @@
-import { Controller, Post, Put } from '@nestjs/common';
+import { Controller, Post, Put, Query } from '@nestjs/common';
 import { WordService } from './word.service';
 import { Word } from './word.entity';
 import {
@@ -12,11 +12,29 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { word_id } from 'src/entity';
+import { note, word_id } from 'src/entity';
+import { User } from 'src/user/user.entity';
+import { UserService } from 'src/user/user.service';
 
 @Controller('word')
 export class WordController {
-  constructor(private readonly wordService: WordService) {}
+  constructor(private readonly wordService: WordService, private readonly userService: UserService) {}
+
+  convert = (wordList:word_id[], user:User):word_id[] => {
+    if (!user || !wordList) return wordList;
+
+    wordList.forEach((word) => {
+      if (user.hasPositiveWord(word.name)) {word.personnal_note = note.positif;
+      }
+       else {
+         if (user.hasNegativeWord(word.name)) word.personnal_note = note.negatif;
+          else word.personnal_note = note.neutre;
+        }
+        return word;});
+
+
+    return wordList;
+  }
 
   @Get('random')
   async getRandomWord(): Promise<word_id[]> {
@@ -27,13 +45,21 @@ export class WordController {
     return word;
   }
 
+  @Get('random/token')
   @UseGuards(AuthGuard)
-  @Put(':id')
-  async note_word(@Request() id: any, @Body() note: boolean, @Param('id') wordId: number) {
-    const word = await this.wordService.note_word(note,wordId, id.user.username);
-    if (!word) {
-      throw new NotFoundException('No random word found.');
-    }
+  async getRandomWordConnected(@Request() id: any): Promise<word_id[]> {
+    const rep = await this.getRandomWord()
+    if (rep) {
+      return this.convert(rep, await this.userService.getUserByEmail(id.user.username));
+  }}
+
+  @UseGuards(AuthGuard)
+  @Put(':id/:note')
+  async note_word(@Request() id: any, @Param('note') note: number, @Param('id') wordId: number):Promise<number> {
+    const word = await this.wordService.note_word(note ,wordId, id.user.username);
+    // if (!word) {
+    //   throw new NotFoundException('No random word found.');
+    // }
     return word;
   }
 
@@ -50,12 +76,19 @@ export class WordController {
   @Get('day')
   async getDayWords(): Promise<word_id[]> {
     try {
-      console.log('///////////////////////');
       return await this.wordService.getDayWords();
     } catch (e) {
       console.log(e);
     }
   }
+
+  @Get('day/token')
+  @UseGuards(AuthGuard)
+  async getDayWordsConnected(@Request() id: any): Promise<word_id[]> {
+    const rep = await this.getDayWords()
+    if (rep) {
+      return this.convert(rep, await this.userService.getUserByEmail(id.user.username));
+  }}
 
   @UseGuards(AuthGuard)
   @Delete(':id')
@@ -67,7 +100,7 @@ export class WordController {
     return { message: 'Word deleted successfully' };
   }
 
-  @Get(':name')
+  @Get('name/:name')
   async getWordByName(@Param('name') name: string): Promise<word_id> {
     name = name.toLocaleLowerCase();
     const word = await this.wordService.getWordByName(name);
@@ -75,6 +108,22 @@ export class WordController {
       throw new NotFoundException('Word not found.');
     }
     return this.wordService.convertWord(word);
+  }
+
+  @Get('popular')
+  async getPopularWords(): Promise<word_id[]> {
+    return await this.wordService.getPopularWords();
+  }
+
+  @Get('unpopular')
+  async getUnpopularWords(): Promise<word_id[]> {
+    return await this.wordService.getUnpopularWords();
+  }
+
+
+  @Get('string/:substring')
+  async findWordsContainingSubstring(@Param('substring') substring: string): Promise<word_id[]> {
+    return await this.wordService.findWordsContainingSubstring(substring);
   }
 
   @Get('id/:id')
@@ -91,5 +140,16 @@ export class WordController {
   async seeWord(@Request() id: any, @Param('id') id_word: number) {
     const newWord = await this.wordService.seeWord(id_word, id.user.username);
     return newWord;
+  }
+
+  @Get('theme')
+  async getWordsByThemes(@Query('themes') themes: string[]): Promise<word_id[]> {
+    return this.wordService.getWordsByThemes(themes);
+  }
+
+  @Get('theme/token')
+  @UseGuards(AuthGuard)
+  async getWordsByThemesConnected(@Request() id: any, @Query('themes') themes: string[]): Promise<word_id[]> {
+    return this.convert(await this.getWordsByThemes(themes), await this.userService.getUserByEmail(id.user.username));
   }
 }

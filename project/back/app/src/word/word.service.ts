@@ -8,15 +8,17 @@ import { ThemeService } from 'src/theme/theme.service';
 import * as fs from 'fs';
 import * as cron from 'node-cron';
 import * as csv from 'csv-parser';
-import { word, word_id } from 'src/entity';
+import { note, word, word_id } from 'src/entity';
 import { UserService } from 'src/user/user.service';
 import * as readline from 'readline';
 import { usedDayWordLength } from './word.entity';
+import { get } from 'http';
 
 @Injectable()
 export class WordService {
-  private dayWords: Word[] = [];
-  private usedDayWords: Word[] = [];
+  private dayWords: number[] = [];
+  private usedDayWords: number[] = [];
+  private allWords: number[] = [];
 
   constructor(
     @InjectRepository(Word)
@@ -30,6 +32,7 @@ export class WordService {
   }
 
   async changeDayWords() {
+    this.allWords = (await this.wordRepository.find({ relations: ['theme', 'positive_note', 'negative_note'] })).map((word) => word.id);
     try {
       this.usedDayWords = this.usedDayWords.concat(this.dayWords);
       if (this.usedDayWords.length > usedDayWordLength)
@@ -37,11 +40,10 @@ export class WordService {
       this.dayWords = [];
       for (let i = 0; i < numberOfDayWord; i++) {
         
-        let word: Word;
+        let word: number;
         do {
           word = await this.getRandomWord();
-          console.log(word);
-        } while (this.usedDayWords.includes(word));
+        } while (!word && this.usedDayWords.includes(word));
         this.dayWords.push(word);
       }
     } catch (e) {
@@ -54,8 +56,31 @@ export class WordService {
     if (this.dayWords.length === 0) {
       await this.changeDayWords();
     }
-    console.log(this.dayWords + 'A')
-    return this.dayWords.map((word) => this.convertWord(word));
+    return (await this.convertWordList(await this.getWordsByIds(this.dayWords)));
+  }
+
+  async convertWordList(wordList: Word[]): Promise<word_id[]> {
+    const ret  = wordList.map(async (word) => {
+      return (this.convertWord(word));
+    });
+    return Promise.all(ret);
+  }
+
+  async getWordsByIds(ids: number[]): Promise<Word[]> {
+    const promises = ids.map(async (id) => {
+      return await this.getWordById(id);
+    });
+  
+    return Promise.all(promises);
+  }
+
+  async findWordsContainingSubstring(substring: string): Promise<word_id[]> {
+    const words = await this.wordRepository
+      .createQueryBuilder('word')
+      .leftJoinAndSelect('word.theme', 'theme')
+      .where('word.name LIKE :substring', { substring: `%${substring}%` })
+      .getMany();
+    return (words).map((word) => this.convertWord(word));
   }
 
   async getRandomWordList(): Promise<word_id[]> {
@@ -73,24 +98,41 @@ export class WordService {
 
   }
 
-  async getRandomWord(): Promise<Word> {
-    const itemCount = await this.wordRepository.count();
+  async getRandomWord(): Promise<number> {
+    const itemCount = this.allWords.length;
     if (itemCount == 0) throw new NotFoundException('No random word found.');
     const id = Math.floor(Math.random() * itemCount) + 1;
-    const randomWord = await this.wordRepository.findOne({where: { id }, relations: ['theme', 'positive_note', 'negative_note']});
+    const randomWord = this.allWords[id]
     return randomWord;
   }
 
-  async note_word(note: boolean, id: number, username:string): Promise<Word> {
+  async note_word(myNote: number, id: number, username:string): Promise<number> {
     const user = await this.userService.getUserByEmail(username);
-    const word = await this.wordRepository.findOne({ where: { id } });
-    if (note) {
-      word.positive_note.push(user);
-    } else {
-      word.negative_note.push(user);
+    let ret = note.neutre;
+    const word = await this.wordRepository.findOne({ where: { id }, relations: ['positive_note', 'negative_note'] });
+    if (!word) {
+      throw new Error(`Word with id ${id} not found.`);
     }
-    await this.wordRepository.update(id, word);
-    return word;
+    if (word.negative_note.some(negativeUser => negativeUser.id == user.id)) {
+      word.negative_note = word.negative_note.filter((word_user) => word_user.id !== user.id);
+    }
+    else {
+      if (myNote == note.negatif) {
+        word.negative_note.push(user);
+        ret = note.negatif;
+      }
+    }
+    if (word.positive_note.some(positiveUser => positiveUser.id == user.id)) {
+      word.positive_note = word.positive_note.filter((word_user) => word_user.id !== user.id);
+    }
+    else {
+      if (myNote == note.positif) {
+        word.positive_note.push(user);
+        ret = note.positif;
+        }
+    }
+    await this.wordRepository.save(word);
+    return ret;
   }
 
   async getWords(): Promise<void> {
@@ -114,16 +156,63 @@ export class WordService {
       example: word.example,
       gender: word.gender,
       id: word.id,
-      theme: word.theme.title,
-      positive_note: word.positive_note.length,
-      negative_note: word.negative_note.length,
+      theme: word.theme?.title??'',
+      positive_note: word.positive_note?.length??-1,
+      negative_note: word.negative_note?.length??-1,
+      personnal_note: note.neutre,
     };
+  }
+
+  async getWordsByThemes(themeNames:string[]): Promise<word_id[]> {
+    let words: Word[] = [];
+    if (!themeNames || themeNames.length == 0)
+      return;
+    for (let i = 0; i < themeNames.length; i++) {
+      console.log(themeNames[i]);
+      const theme = await this.themeService.getThemeAndWordsByName(themeNames[i]);
+      if (theme){
+        words = words.concat(theme.words);
+      }
+    }
+    return this.convertWordList(words);
+  }
+
+  async getLikedWords(username: string): Promise<word_id[]> {
+    const user = await this.userService.getUserByEmail(username);
+    return this.convertWordList(user.positive_note);
+  }
+
+  async getDislikedWords(username: string): Promise<word_id[]> {
+    const user = await this.userService.getUserByEmail(username);
+    return this.convertWordList(user.negative_note);
+  }
+
+  async getSeenWords(username: string): Promise<word_id[]> {
+    const user = await this.userService.getUserByEmail(username);
+    return this.convertWordList(await this.getWordsByIds(user.word_seeing));
+  }
+
+  async getPopularWords(): Promise<word_id[]> {
+    const words = await this.wordRepository.find({ relations: ['theme', 'positive_note', 'negative_note'] });
+    const words2 = words.filter((word) => word.positive_note.length - word.negative_note.length > 0);
+    words2.sort((a, b) => {
+      return (b.positive_note.length - b.negative_note.length) - (a.positive_note.length - a.negative_note.length);
+    });
+    return this.convertWordList(words2.slice(0, 100));
+  }
+
+  async getUnpopularWords(): Promise<word_id[]> {
+    const words = await this.wordRepository.find({ relations: ['theme', 'positive_note', 'negative_note'] });
+    const words2 = words.filter((word) => word.negative_note.length - word.positive_note.length > 0);
+    words2.sort((a, b) => {
+      return (a.positive_note.length - a.negative_note.length) - (b.positive_note.length - b.negative_note.length);
+    });
+    return this.convertWordList(words2.slice(0, 100));
   }
 
   async createWord(wordData: word, bringToCSV: boolean = true) {
     const theme = await this.themeService.getThemeByName(wordData.theme);
-    console.log(wordData.name);
-
+    
     if (!theme) {
       throw new NotFoundException('Theme not found.');
     }
@@ -229,10 +318,14 @@ export class WordService {
 
   async seeWord(id: number, username: string): Promise<Word> {
     const user = await this.userService.getUserByEmail(username);
-    const word = await this.wordRepository.findOne({ where: { id } });
-    if (word)
+    const word = await this.wordRepository.findOne({ where: { id }, relations: ['theme', 'positive_note', 'negative_note'] });
+    if (word && user) {
+
       user.word_seeing.push(id);
-      await this.userService.updateUser(id, user);
+      // await this.userService.updateUser(id, user);
+      await this.userService.updateUser(user.id, user);
+
+    }
     return word;
   }
 

@@ -54,9 +54,7 @@ export class UserService {
   }
 
   async login(user: User) {
-    console.log(user);
     const RealUser = await this.getUserByEmail(user.email);
-    console.log(RealUser);
     if (!RealUser) return null;
     if (bcrypt.compare(user.password, RealUser.password)) {
       let role = 'user';
@@ -79,9 +77,10 @@ export class UserService {
   }
 
   async updateUser(id: number, userData: User){
-    const updatedUser = await this.userRepository.update(id, userData);
-    if (!updatedUser) {
-      throw new NotFoundException('User not found.');
-    }
+    // const updatedUser = await this.userRepository.update(id, userData);
+    // if (!updatedUser) {
+    //   throw new NotFoundException('User not found.');
+    // }
+    this.userRepository.save(userData);
   }
 }

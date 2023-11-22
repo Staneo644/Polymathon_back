@@ -17,7 +17,7 @@ export class ThemeService {
   async getThemes(): Promise<theme_id[]> {
     // let themes: Theme[] = [];
     const themes = await this.themeRepository.find({
-      relations: ['parentTheme'],
+      relations: ['parentTheme', 'words'],
     });
     const ret = themes.map((theme) => ({
       name: theme.title,
@@ -133,8 +133,13 @@ export class ThemeService {
   }
 
   async getThemeByName(title: string): Promise<Theme> {
-    return await this.themeRepository.findOne({ where: { title } });
+    return await this.themeRepository.findOne({ where: { title }, relations: ['words'] });
   }
+
+  async getThemeAndWordsByName(title: string): Promise<Theme> {
+    return await this.themeRepository.findOne({ where: { title }, relations: ['words', 'words.positive_note', 'words.negative_note', 'words.theme'] });
+  }
+  
 
   async addTheme(themeData: theme): Promise<Theme> {
     const test = await this.getThemeByName(themeData.name);
