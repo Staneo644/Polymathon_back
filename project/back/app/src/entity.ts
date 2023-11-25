@@ -29,6 +29,7 @@ export interface user {
 export interface user_id extends user {
   id: number;
   word_seeing: number[];
+  news_letter: boolean;
 }
 
 export interface theme {

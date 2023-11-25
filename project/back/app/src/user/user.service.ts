@@ -32,6 +32,13 @@ export class UserService {
     return await this.login(user);
   }
 
+  async newsletter(user:string): Promise<void> {
+    const isUser = await this.getUserByEmail(user);
+    if (!isUser) return null;
+    isUser.news_letter = !isUser.news_letter;
+    await this.userRepository.save(isUser);
+  }
+
   async deleteUser(id: number): Promise<void> {
     await this.userRepository.delete(id);
   }

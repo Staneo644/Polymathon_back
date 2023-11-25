@@ -13,6 +13,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ default: false })
+  news_letter: boolean;
+
   @Column('jsonb')
   word_seeing: number[];
 

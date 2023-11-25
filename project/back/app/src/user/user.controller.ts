@@ -19,8 +19,12 @@ import { user_id } from 'src/entity';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post()
+  @Post('create')
   async createUser(@Body() user: User) {
+
+    console.log(process.env.EMAIL)
+    console.log(process.env.EMAIL_PASSWORD)
+
     console.log(user);
     console.log(jwtConstants);
     user.email = user.email.toLowerCase();
@@ -66,5 +70,13 @@ export class UserController {
   async login(@Body() user: User) {
     user.email = user.email.toLowerCase();
     return await this.userService.login(user);
+  }
+
+  @Post('newsletter')
+  @UseGuards(AuthGuard)
+  async newsletter(@Request() id: any) {
+    console.log("newsletter")
+    await this.userService.newsletter(id.user.username);
+    return (true)
   }
 }

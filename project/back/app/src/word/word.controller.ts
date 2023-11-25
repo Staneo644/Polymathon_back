@@ -120,6 +120,18 @@ export class WordController {
     return await this.wordService.getUnpopularWords();
   }
 
+  @Get('liked')
+  @UseGuards(AuthGuard)
+  async getLikedWords(@Request() id: any): Promise<word_id[]> {
+    return (await this.wordService.getLikedWords(id.user.username));
+  }
+
+  @Get('disliked')
+  @UseGuards(AuthGuard)
+  async getDislikedWords(@Request() id: any): Promise<word_id[]> {
+    return (await this.wordService.getDislikedWords(id.user.username));
+  }
+
 
   @Get('string/:substring')
   async findWordsContainingSubstring(@Param('substring') substring: string): Promise<word_id[]> {

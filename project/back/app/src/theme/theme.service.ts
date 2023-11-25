@@ -62,6 +62,10 @@ export class ThemeService {
       name: 'Œnologie',
       parent: (await this.getThemeByName('Art')).title,
     });
+    this.addTheme({
+      name: 'Vêture',
+      parent: (await this.getThemeByName('Art')).title,
+    });
 
     this.addTheme({
       name: 'Médecine',
